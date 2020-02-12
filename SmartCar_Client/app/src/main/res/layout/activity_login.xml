@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingTop="16dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="16dp"
+    android:scrollbarStyle="outsideOverlay"
+    tools:context=".LoginActivity"
+    android:background="@color/colorBackground">
+
+    <!-- Login progress -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <ImageView
+            android:id="@+id/SmartCar_img"
+            android:layout_width="360dp"
+            android:layout_height="270dp"
+            app:srcCompat="@drawable/smartcar_letter_4x3" />
+
+        <EditText
+            android:id="@+id/Raspberry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Raspberry IP"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_marginTop="48dp"/>
+
+        <EditText
+            android:id="@+id/ID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="ID"
+            android:inputType="text"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_marginTop="8dp"/>
+
+        <EditText
+            android:id="@+id/Password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/Login"
+            style="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="로그인"
+            android:textStyle="bold"
+            android:background="@color/colorItem" />
+
+    </LinearLayout>
+
+</ScrollView>
