@@ -1,28 +1,56 @@
 package com.example.smartcar_client;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class MainActivity extends AppCompatActivity {
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.UnknownHostException;
 
-    //속도
-    private static int num = 0;
+public class MainActivity extends LoginActivity {
+
+    //sendBuf : private → onCreate, setSocket
+    //setSocket : private → onCreate, onDestroy
+    private String sendBuf = null;
+    private SetSocket setSocket = null;
+
+    //num : private static → onCreate, setSocket
+    //Speed_txt : private → onCreate, setSocket
+    //Speed_img : private → onCreate, setSocket
+    private static int num = -1;
+    private TextView Speed_txt = null;
+    private ImageView Speed_img = null;
+
+    //AsyncTask 종료
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(setSocket != null){
+            System.out.println("★★★★  MainActivity : setSocket.cancel() Called !!  ★★★★");
+            setSocket.cancel(true);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //버튼 초기화
+        Intent intent = getIntent();
+        sendBuf = intent.getStringExtra("sendBuf");
+
+        //초기화
+        Speed_txt = (TextView)findViewById(R.id.Speed);
+        Speed_img = (ImageView) findViewById(R.id.Speed_img);
         final ToggleButton Power = (ToggleButton) this.findViewById(R.id.Power);
         final ToggleButton Light = (ToggleButton) this.findViewById(R.id.Light);
         final ImageButton Horn = (ImageButton) this.findViewById(R.id.Horn);
@@ -33,24 +61,41 @@ public class MainActivity extends AppCompatActivity {
         final ImageButton Plus = (ImageButton) this.findViewById(R.id.Plus);
         final ImageButton Minus = (ImageButton) this.findViewById(R.id.Minus);
 
-        //속도
-        final TextView Speed = (TextView)findViewById(R.id.Speed);
-
+        //Power 기능 구현
         Power.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(Power.isChecked()){
-                    Speed.setText(String.valueOf(num));
                     Power.setBackgroundResource(R.drawable.power_on);
+                    num = 0;
+                    //TCP 통신을 위한 Socket 함수 실행
+                    try {
+                        setSocket = new SetSocket(num);
+                        setSocket.execute();
+                    } catch (Exception e) {
+                        System.out.println("★★★★  MainActivity : Power-On setSocket Exception Occurred !!  ★★★★");
+                        e.printStackTrace();
+                    }
+
                     setCustomToast(MainActivity.this, "Power ON");
                 }else{
-                    num = 0;
-                    Speed.setText("OFF");
-                    Power.setBackgroundResource(R.drawable.power_off);;
+                    Power.setBackgroundResource(R.drawable.power_off);
+                    num = -1;
+                    //TCP 통신을 위한 Socket 함수 실행
+                    try {
+                        setSocket = new SetSocket(num);
+                        setSocket.execute();
+                    } catch (Exception e) {
+                        System.out.println("★★★★  MainActivity : Power-Off setSocket Exception Occurred !!  ★★★★");
+                        e.printStackTrace();
+                    }
+
                     setCustomToast(MainActivity.this, "Power OFF");
                 }
             }
         });
+
+        //Light 기능 구현
         Light.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Horn 기능 구현
         Horn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Handle 기능 구현
         Front.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
@@ -120,6 +168,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Speed++ 기능 구현
         Plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +177,16 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Plus.setBackgroundResource(R.drawable.plus_on);
                         setCustomToast(MainActivity.this, "Speed UP");
-                        Speed.setText(String.valueOf(++num));
+                        num++;
+
+                        //TCP 통신을 위한 Socket 함수 실행
+                        try {
+                            setSocket = new SetSocket(num);
+                            setSocket.execute();
+                        } catch (Exception e) {
+                            System.out.println("★★★★  MainActivity : Speed-Up setSocket Exception Occurred !!  ★★★★");
+                            e.printStackTrace();
+                        }
 
                         // Handler 0.1초간 Delay 주기
                         Handler handler = new Handler();
@@ -149,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        //Speed-- 기능 구현
         Minus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,7 +217,16 @@ public class MainActivity extends AppCompatActivity {
                     {
                         Minus.setBackgroundResource(R.drawable.minus_on);
                         setCustomToast(MainActivity.this, "Speed DOWN");
-                        Speed.setText(String.valueOf(--num));
+                        num--;
+
+                        //TCP 통신을 위한 Socket 함수 실행
+                        try {
+                            setSocket = new SetSocket(num);
+                            setSocket.execute();
+                        } catch (Exception e) {
+                            System.out.println("★★★★  MainActivity : Speed-Down setSocket Exception Occurred !!  ★★★★");
+                            e.printStackTrace();
+                        }
 
                         // Handler 0.1초간 Delay 주기
                         Handler handler = new Handler();
@@ -178,27 +247,90 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
     }
 
-    //Custom Toast Message
-    public static void setCustomToast(Context context, String msg) {
-        TextView m_temp = new TextView(context);
-        m_temp.setBackgroundResource(R.color.colorItem);
-        m_temp.setPadding(32,32,32,32);
-        m_temp.setTextSize(16);
-        m_temp.setText(msg);
+    //TCP 통신을 위한 Socket 함수
+    @SuppressLint("StaticFieldLeak")
+    private class SetSocket extends AsyncTask<Void, Void, Boolean> {
+        //Speed
+        Integer speed = -1;
+        //Sensor 추가해서, Light, Horn, Handle 등 부가 기능 추가
 
-        final Toast toast = Toast.makeText(context, "", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER_HORIZONTAL|Gravity.BOTTOM, 0, 48);
-        toast.setView(m_temp);
-        toast.show();
+        //Constructor
+        SetSocket(Integer Speed) {
+            speed = Speed;
+        }
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                toast.cancel();
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        //Background TCP 연결 시도
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                System.out.println("★★★★  MainActivity : Now, we are in Async Background  ★★★★");
+
+                //시동 꺼짐 : sendBuf 없이 return true
+                if(num==-1){
+                    return true;
+                }
+
+                //시동 켜짐 : sendBuf → ID, PW, Speed 저장해서 송신
+                sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
+                sendBuf = sendBuf + "@speed" + num + "DD";
+
+                OutputStream out = socket.getOutputStream();
+                out.write(sendBuf.getBytes());
+                return true;
+
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  MainActivity : Background UnknownHostException Occurred !!  ★★★★");
+                return false;
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  MainActivity : Background IOException Occurred !!  ★★★★");
+                return false;
             }
-        }, 1000);
+        }
+
+        //Background 실행 후 결과
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            //Background Exception
+            if (!result) {
+                setCustomToast(MainActivity.this, "TCP 통신에 문제가 발생했습니다");
+            }
+            else{
+                //Speed_txt, Speed_img 설정
+                switch(num){
+                    case -1:
+                        Speed_txt.setText("OFF");
+                        Speed_img.setBackgroundResource(R.drawable.speed);
+                        break;
+                    case 0:
+                        Speed_txt.setText(String.valueOf(num));
+                        Speed_img.setBackgroundResource(R.drawable.speed_0);
+                        break;
+                    case 1:
+                        Speed_txt.setText(String.valueOf(num));
+                        Speed_img.setBackgroundResource(R.drawable.speed_1);
+                        break;
+                    case 2:
+                        Speed_txt.setText(String.valueOf(num));
+                        Speed_img.setBackgroundResource(R.drawable.speed_2);
+                        break;
+                    case 3:
+                        Speed_txt.setText(String.valueOf(num));
+                        Speed_img.setBackgroundResource(R.drawable.speed_3);
+                }
+            }
+        }
     }
 }

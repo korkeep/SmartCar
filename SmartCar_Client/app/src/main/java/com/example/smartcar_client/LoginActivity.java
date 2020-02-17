@@ -22,11 +22,12 @@ import java.net.UnknownHostException;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText et_Raspberry, et_ID, et_Password;
+    //socket : public static → MainActivity, onCreate, onDestroy
+    //setSocket : private → onCreate, onDestroy
+    public static Socket socket = null;
     private SetSocket setSocket = null;
-    private Socket socket = null;
 
-    //onDestroy 상태면 AsyncTask, Socket 종료해준다
+    //AsyncTask, Socket 종료
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -39,7 +40,6 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println("★★★★  LoginActivity : setSocket.cancel() Called !!  ★★★★");
                 setSocket.cancel(true);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,20 +50,19 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        //EditText 초기화
-        et_ID = findViewById(R.id.ID);
-        et_Password = findViewById(R.id.Password);
-        et_Raspberry = findViewById(R.id.Raspberry);
+        //초기화
+        final EditText et_ID = findViewById(R.id.ID);
+        final EditText et_Password = findViewById(R.id.Password);
+        final EditText et_Raspberry = findViewById(R.id.Raspberry);
+        Button btn_Login = findViewById(R.id.Login);
 
         //Login 기능 구현
-        Button btn_Login = findViewById(R.id.Login);
         btn_Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //Keyboard 내려감
                 InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
 
                 //EditText의 ID, PW, Raspberry IP → String 변환
                 String ID = et_ID.getText().toString();
@@ -74,6 +73,7 @@ public class LoginActivity extends AppCompatActivity {
                 try {
                     setSocket = new SetSocket(Raspberry, ID, Password);
                     setSocket.execute();
+
                 } catch (Exception e) {
                     System.out.println("★★★★  LoginActivity : setSocket Exception Occurred !!  ★★★★");
                     e.printStackTrace();
@@ -84,8 +84,8 @@ public class LoginActivity extends AppCompatActivity {
 
     //TCP 통신을 위한 Socket 함수
     @SuppressLint("StaticFieldLeak")
-    public class SetSocket extends AsyncTask<Void, Void, Boolean> {
-        //소켓 통신을 위한 변수 + 결과값 받아오는 변수 선언
+    private class SetSocket extends AsyncTask<Void, Void, Boolean> {
+        //IP, ID, PW, sendBuf
         String id = "";
         String password = "";
         String raspberry = "";
@@ -109,6 +109,11 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 System.out.println("★★★★  LoginActivity : Now, we are in Async Background  ★★★★");
 
+                /*
+                tcp_server.c 확인 결과, return 값을 Client 쪽에 넘겨주지 않고,
+                Printf 함수를 사용해 내부 terminal 상에서 Log 통해 확인하도록 짜여있다.
+                */
+
                 //Socket 연결 (Server ← Client), port : 10080
                 socket = new Socket(raspberry, 10080);
 
@@ -118,16 +123,12 @@ public class LoginActivity extends AppCompatActivity {
                 out.write(sendBuf.getBytes());
                 return true;
 
-                /*
-                tcp_server.c 확인 결과, return 값을 Client 쪽에 넘겨주지 않고,
-                Printf 함수를 사용해 내부 terminal 상에서 Log 통해 확인하도록 짜여있다.
-                */
-
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 System.out.println("★★★★  LoginActivity : Background UnknownHostException Occurred !!  ★★★★");
                 return false;
+
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -153,20 +154,21 @@ public class LoginActivity extends AppCompatActivity {
                 setCustomToast(LoginActivity.this, "ID, PW가 일치하지 않습니다");
             }
             else {
-                //Background Exception 발생 시
+                //Background Exception
                 if (!result) {
                     setCustomToast(LoginActivity.this, "TCP 통신에 문제가 발생했습니다");
                 }
-                //정상적인 경우 MainActivity 실행
+                //intent → MainActivity 실행, sendBuf
                 else {
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    intent.putExtra("sendBuf", sendBuf);
                     startActivity(intent);
                 }
             }
         }
     }
 
-    //Custom Toast Message
+    //Custom Toast Message : public static → LoginActivity, MainActivity
     public static void setCustomToast(Context context, String msg) {
         TextView m_temp = new TextView(context);
         m_temp.setBackgroundResource(R.color.colorItem);
