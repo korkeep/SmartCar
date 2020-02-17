@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,14 +23,23 @@ import java.net.UnknownHostException;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText et_Raspberry, et_ID, et_Password;
-    private Socket socket;
+    private SetSocket setSocket = null;
+    private Socket socket = null;
 
-    //onStop 상태면 Socket 종료해준다
+    //onDestroy 상태면 AsyncTask, Socket 종료해준다
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         try {
-            socket.close();
+            if(socket != null){
+                System.out.println("★★★★  LoginActivity : socket.close() Called !!  ★★★★");
+                socket.close();
+            }
+            if(setSocket != null){
+                System.out.println("★★★★  LoginActivity : setSocket.cancel() Called !!  ★★★★");
+                setSocket.cancel(true);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -50,6 +60,11 @@ public class LoginActivity extends AppCompatActivity {
         btn_Login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Keyboard 내려감
+                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+
                 //EditText의 ID, PW, Raspberry IP → String 변환
                 String ID = et_ID.getText().toString();
                 String Password = et_Password.getText().toString();
@@ -57,10 +72,10 @@ public class LoginActivity extends AppCompatActivity {
 
                 //TCP 통신을 위한 Socket 함수 실행
                 try {
-                    SetSocket setSocket = new SetSocket(Raspberry, ID, Password);
+                    setSocket = new SetSocket(Raspberry, ID, Password);
                     setSocket.execute();
                 } catch (Exception e) {
-                    System.out.println("**** 예외가 발생했다!!! ****");
+                    System.out.println("★★★★  LoginActivity : setSocket Exception Occurred !!  ★★★★");
                     e.printStackTrace();
                 }
             }
@@ -92,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                System.out.println("★★★★  Now, we are in Async Background  ★★★★");
+                System.out.println("★★★★  LoginActivity : Now, we are in Async Background  ★★★★");
 
                 //Socket 연결 (Server ← Client), port : 10080
                 socket = new Socket(raspberry, 10080);
@@ -111,12 +126,12 @@ public class LoginActivity extends AppCompatActivity {
             } catch (UnknownHostException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                System.out.println("UnknownHostException: " + e.toString());
+                System.out.println("★★★★  LoginActivity : Background UnknownHostException Occurred !!  ★★★★");
                 return false;
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                System.out.println("IOException: " + e.toString());
+                System.out.println("★★★★  LoginActivity : Background IOException Occurred !!  ★★★★");
                 return false;
             }
         }
@@ -136,10 +151,14 @@ public class LoginActivity extends AppCompatActivity {
             //ID,PW(kisa, 1234) Check
             if (!(id.equals("kisa") && password.equals("1234"))) {
                 setCustomToast(LoginActivity.this, "ID, PW가 일치하지 않습니다");
-            } else {
+            }
+            else {
+                //Background Exception 발생 시
                 if (!result) {
                     setCustomToast(LoginActivity.this, "TCP 통신에 문제가 발생했습니다");
-                } else {
+                }
+                //정상적인 경우 MainActivity 실행
+                else {
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
                 }
