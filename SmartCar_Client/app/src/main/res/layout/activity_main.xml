@@ -74,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:text="비상등"
+                    android:text="전조등"
                     android:textSize="16sp" />
 
                 <ToggleButton

@@ -24,14 +24,20 @@ public class LoginActivity extends AppCompatActivity {
 
     //socket : public static → MainActivity, onCreate, onDestroy
     //setSocket : private → onCreate, onDestroy
+    //sendBuf : private → onCreate, setSocketSpeed
     public static Socket socket = null;
     private SetSocket setSocket = null;
+    private String sendBuf = null;
 
     //AsyncTask, Socket 종료
     @Override
     protected void onDestroy() {
         super.onDestroy();
         try {
+            //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
+            sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
+            sendBuf = sendBuf + "@exit" + "DD";
+
             if(socket != null){
                 System.out.println("★★★★  LoginActivity : socket.close() Called !!  ★★★★");
                 socket.close();
@@ -89,7 +95,6 @@ public class LoginActivity extends AppCompatActivity {
         String id = "";
         String password = "";
         String raspberry = "";
-        String sendBuf = "";
 
         //Constructor
         SetSocket(String Rasp, String ID, String PW) {
@@ -149,12 +154,6 @@ public class LoginActivity extends AppCompatActivity {
             다른 Raspberry IP 주소가 입력된 경우의 예외처리까지 성공!!!
             */
 
-            //집에서 test
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra("sendBuf", sendBuf);
-            startActivity(intent);
-
-            /*
             //ID,PW(kisa, 1234) Check
             if (!(id.equals("kisa") && password.equals("1234"))) {
                 setCustomToast(LoginActivity.this, "ID, PW가 일치하지 않습니다");
@@ -171,7 +170,6 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             }
-             */
         }
     }
 

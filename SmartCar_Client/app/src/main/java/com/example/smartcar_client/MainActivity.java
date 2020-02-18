@@ -62,6 +62,10 @@ public class MainActivity extends LoginActivity {
             else if(System.currentTimeMillis()-time<1000){
                 System.out.println("★★★★  MainActivity : Process Terminated  ★★★★");
 
+                //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
+                sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
+                sendBuf = sendBuf + "@exit" + "DD";
+
                 //Process 종료
                 moveTaskToBack(true);
                 finishAndRemoveTask();
@@ -347,9 +351,7 @@ public class MainActivity extends LoginActivity {
                 System.out.println("★★★★  MainActivity : Now, we are in SetSocketSpeed  ★★★★");
 
                 //Power-Off : sendBuf 없이, return true
-                if(speed==-1){
-                    return true;
-                }
+                if (speed==-1) { return true; }
 
                 //Power-On : sendBuf → ID, PW, Speed 저장해서 송신
                 sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
