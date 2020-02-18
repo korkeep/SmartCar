@@ -12,6 +12,7 @@
 
         <activity
             android:name=".LoginActivity"
+            android:stopWithTask="false"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +25,7 @@
 
         <activity
             android:name=".MainActivity"
+            android:stopWithTask="false"
             android:configChanges="orientation|keyboardHidden|screenSize">
 
         </activity>

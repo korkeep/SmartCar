@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                System.out.println("★★★★  LoginActivity : Now, we are in Async Background  ★★★★");
+                System.out.println("★★★★  LoginActivity : Now, we are in SetSocket  ★★★★");
 
                 /*
                 tcp_server.c 확인 결과, return 값을 Client 쪽에 넘겨주지 않고,
@@ -149,6 +149,12 @@ public class LoginActivity extends AppCompatActivity {
             다른 Raspberry IP 주소가 입력된 경우의 예외처리까지 성공!!!
             */
 
+            //집에서 test
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.putExtra("sendBuf", sendBuf);
+            startActivity(intent);
+
+            /*
             //ID,PW(kisa, 1234) Check
             if (!(id.equals("kisa") && password.equals("1234"))) {
                 setCustomToast(LoginActivity.this, "ID, PW가 일치하지 않습니다");
@@ -165,6 +171,7 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             }
+             */
         }
     }
 
