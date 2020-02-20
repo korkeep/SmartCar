@@ -2,6 +2,7 @@ package com.example.smartcar_client;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.icu.util.Output;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Bundle;
@@ -62,9 +63,8 @@ public class MainActivity extends LoginActivity {
             else if(System.currentTimeMillis()-time<1000){
                 System.out.println("★★★★  MainActivity : Process Terminated  ★★★★");
 
-                //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
-                sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
-                sendBuf = sendBuf + "@exit" + "DD";
+                SetSocketDestroy setSocketDestroy = new SetSocketDestroy();
+                setSocketDestroy.execute();
 
                 //Process 종료
                 moveTaskToBack(true);
@@ -599,6 +599,53 @@ public class MainActivity extends LoginActivity {
                 }
             }
             handle = -1;
+        }
+    }
+
+    //TCP 통신을 끊기 위한 SetSocketDestroy 함수
+    @SuppressLint("StaticFieldLeak")
+    private class SetSocketDestroy extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() { super.onPreExecute(); }
+
+        //Background TCP 연결 끊기 시도
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                System.out.println("★★★★  MainActivity : Now, we are in SetSocketDestroy  ★★★★");
+
+                //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
+                sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
+                sendBuf = sendBuf + "@exit" + "DD";
+
+                OutputStream out = socket.getOutputStream();
+                out.write(sendBuf.getBytes());
+
+                return true;
+
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  MainActivity : SetSocketDestroy UnknownHostException Occurred !!  ★★★★");
+                return false;
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  MainActivity : SetSocketDestroy IOException Occurred !!  ★★★★");
+                return false;
+            }
+        }
+
+        //Background 실행 후 결과
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            //Background Exception
+            if (!result) {
+                setCustomToast(MainActivity.this, "TCP 통신에 문제가 발생했습니다");
+            }
         }
     }
 }

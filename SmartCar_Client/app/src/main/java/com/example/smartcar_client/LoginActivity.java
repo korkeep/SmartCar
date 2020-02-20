@@ -33,22 +33,16 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        try {
-            //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
-            sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
-            sendBuf = sendBuf + "@exit" + "DD";
+        System.out.println("★★★★  LoginActivity : Process Terminated  ★★★★");
 
-            if(socket != null){
-                System.out.println("★★★★  LoginActivity : socket.close() Called !!  ★★★★");
-                socket.close();
-            }
-            if(setSocket != null){
-                System.out.println("★★★★  LoginActivity : setSocket.cancel() Called !!  ★★★★");
-                setSocket.cancel(true);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
+        SetSocketDestroy setSocketDestroy = new SetSocketDestroy();
+        setSocketDestroy.execute();
+
+        //Process 종료
+        moveTaskToBack(true);
+        finishAndRemoveTask();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     @Override
@@ -150,12 +144,12 @@ public class LoginActivity extends AppCompatActivity {
             /*
             tcp_server.c의 ID,PW(mesl, 348)를 변경해서 컴파일 후 동작시켜 보니,
             TCPAgent.exe 프로그램 자체에서 Login 시도를 할 수 없도록 막고 있었다.
-            TCPAgent.exe 프로그램에서도 ID,PW(kisa, 1234) 하드코딩 돼 있을 확률 ↑
+            TCPAgent.exe 프로그램에서도 ID,PW(mesl, 348) 하드코딩 돼 있을 확률 ↑
             다른 Raspberry IP 주소가 입력된 경우의 예외처리까지 성공!!!
             */
 
-            //ID,PW(kisa, 1234) Check
-            if (!(id.equals("kisa") && password.equals("1234"))) {
+            //ID,PW(mesl, 348) Check
+            if (!(id.equals("mesl") && password.equals("348"))) {
                 setCustomToast(LoginActivity.this, "ID, PW가 일치하지 않습니다");
             }
             else {
@@ -169,6 +163,53 @@ public class LoginActivity extends AppCompatActivity {
                     intent.putExtra("sendBuf", sendBuf);
                     startActivity(intent);
                 }
+            }
+        }
+    }
+
+    //TCP 통신을 끊기 위한 SetSocketDestroy 함수
+    @SuppressLint("StaticFieldLeak")
+    private class SetSocketDestroy extends AsyncTask<Void, Void, Boolean> {
+
+        @Override
+        protected void onPreExecute() { super.onPreExecute(); }
+
+        //Background TCP 연결 끊기 시도
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                System.out.println("★★★★  LoginActivity : Now, we are in SetSocketDestroy  ★★★★");
+
+                //Shutdown : sendBuf → ID, PW, Exit 저장해서 송신
+                sendBuf = sendBuf.substring(0, sendBuf.lastIndexOf("@"));
+                sendBuf = sendBuf + "@exit" + "DD";
+
+                OutputStream out = socket.getOutputStream();
+                out.write(sendBuf.getBytes());
+
+                return true;
+
+            } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  LoginActivity : SetSocketDestroy UnknownHostException Occurred !!  ★★★★");
+                return false;
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                System.out.println("★★★★  LoginActivity : SetSocketDestroy IOException Occurred !!  ★★★★");
+                return false;
+            }
+        }
+
+        //Background 실행 후 결과
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            //Background Exception
+            if (!result) {
+                setCustomToast(LoginActivity.this, "TCP 통신에 문제가 발생했습니다");
             }
         }
     }
