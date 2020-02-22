@@ -12,8 +12,7 @@
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
     android:scrollbarStyle="outsideOverlay"
-    tools:context=".LoginActivity"
-    android:background="@color/colorBackground">
+    tools:context=".LoginActivity">
 
     <!-- Login progress -->
     <LinearLayout
@@ -22,7 +21,8 @@
         android:gravity="center"
         android:orientation="vertical"
         android:focusable="true"
-        android:focusableInTouchMode="true">
+        android:focusableInTouchMode="true"
+        android:background="@color/colorBackground">
 
         <ImageView
             android:id="@+id/SmartCar_img"

@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorBackground"
     android:clipToPadding="false"
     android:fillViewport="true"
     android:orientation="vertical"
@@ -20,7 +19,8 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@color/colorBackground">
 
 
         <ImageView
