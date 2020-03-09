@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.smartcar_client">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,27 +11,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/NoTitle">
-
+        <activity android:name=".IPActivity"></activity>
         <activity
             android:name=".LoginActivity"
-            android:stopWithTask="false"
-            android:configChanges="orientation|keyboardHidden|screenSize">
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:stopWithTask="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
-
         <activity
             android:name=".MainActivity"
-            android:stopWithTask="false"
-            android:configChanges="orientation|keyboardHidden|screenSize">
-
-        </activity>
-
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

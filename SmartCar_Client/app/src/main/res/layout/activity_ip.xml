@@ -12,7 +12,7 @@
     android:paddingRight="16dp"
     android:paddingBottom="16dp"
     android:scrollbarStyle="outsideOverlay"
-    tools:context=".LoginActivity">
+    tools:context=".IPActivity">
 
     <!-- Login progress -->
     <LinearLayout
@@ -31,53 +31,25 @@
             app:srcCompat="@drawable/smartcar_letter_4x3" />
 
         <EditText
-            android:id="@+id/ID"
+            android:id="@+id/Raspberry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="ID"
+            android:hint="Raspberry IP"
             android:inputType="text"
             android:maxLines="1"
             android:singleLine="true"
             android:layout_marginTop="8dp"
             android:imeOptions="flagNoExtractUi" />
 
-        <EditText
-            android:id="@+id/Password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:layout_marginTop="8dp"
-            android:imeOptions="flagNoExtractUi" />
-
-        <LinearLayout
+        <Button
+            android:id="@+id/IPSave"
+            style="?android:textAppearanceSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="24dp">
-
-            <Button
-                android:id="@+id/Login"
-                style="?android:textAppearanceSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorItem"
-                android:layout_marginEnd="8dp"
-                android:text="로그인"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/IPSet"
-                style="?android:textAppearanceSmall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@color/colorItem"
-                android:layout_marginStart="8dp"
-                android:text="IP 설정"
-                android:textStyle="bold" />
-        </LinearLayout>
+            android:layout_marginTop="24dp"
+            android:text="IP 저장"
+            android:textStyle="bold"
+            android:background="@color/colorItem" />
 
     </LinearLayout>
 

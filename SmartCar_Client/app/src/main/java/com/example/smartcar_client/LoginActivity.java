@@ -15,6 +15,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -53,8 +56,8 @@ public class LoginActivity extends AppCompatActivity {
         //초기화
         final EditText et_ID = findViewById(R.id.ID);
         final EditText et_Password = findViewById(R.id.Password);
-        final EditText et_Raspberry = findViewById(R.id.Raspberry);
         Button btn_Login = findViewById(R.id.Login);
+        Button btn_IPSet = findViewById(R.id.IPSet);
 
         //Login 기능 구현
         btn_Login.setOnClickListener(new View.OnClickListener() {
@@ -64,10 +67,29 @@ public class LoginActivity extends AppCompatActivity {
                 InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
 
-                //EditText의 ID, PW, Raspberry IP → String 변환
+                //EditText의 ID, PW → String 변환
                 String ID = et_ID.getText().toString();
                 String Password = et_Password.getText().toString();
-                String Raspberry = et_Raspberry.getText().toString();
+
+                //SmartCar.txt의 Raspberry IP → 읽어오기
+                String Raspberry = null;
+                File file = new File(getFilesDir(), "SmartCar.txt");
+                //SmartCar.txt 파일 읽어오기
+                if(file.exists()){
+                    try{
+                        String line = null;
+                        FileReader fr = new FileReader(file);
+                        BufferedReader buf = new BufferedReader(fr);
+
+                        Raspberry = buf.readLine();
+
+                        buf.close();
+                        fr.close();
+
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
 
                 //TCP 통신을 위한 Socket 함수 실행
                 try {
@@ -78,6 +100,20 @@ public class LoginActivity extends AppCompatActivity {
                     System.out.println("★★★★  LoginActivity : setSocket Exception Occurred !!  ★★★★");
                     e.printStackTrace();
                 }
+            }
+        });
+
+        //IPSet 기능 구현
+        btn_IPSet.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //Keyboard 내려감
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+
+                //IPActivity 시작
+                Intent intent = new Intent(getApplicationContext(), IPActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -155,7 +191,7 @@ public class LoginActivity extends AppCompatActivity {
             else {
                 //Background Exception
                 if (!result) {
-                    setCustomToast(LoginActivity.this, "TCP 통신에 문제가 발생했습니다");
+                    setCustomToast(LoginActivity.this, "IP 주소를 올바르게 설정해주세요");
                 }
                 //intent → MainActivity 실행, sendBuf
                 else {
