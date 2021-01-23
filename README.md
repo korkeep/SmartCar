@@ -31,7 +31,7 @@ Implementation of Smart-Car CAN protocol & Utility data for IVI(In-Vehicle Infot
 - nmap <IVI Gateway IP> -sS -sV -p <Port Number>
 - ping <IVI Gateway IP> -c 5
 - gzip -d /usr/share/wordlists/rockyou.txt.gz
--  hydra -l <ID> -P <PW Dictionary File Path> -V -f -o <Output Path> <Service://IP:Port>
+- hydra -l <ID> -P <PW Dictionary File Path> -V -f -o <Output Path> <Service://IP:Port>
 ```
 - **Step 4**: root 권한으로 SSH 원격 접속
 ```
