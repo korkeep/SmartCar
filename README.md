@@ -15,6 +15,7 @@ Implementation of Smart-Car CAN protocol & Utility data for IVI(In-Vehicle Infot
 
 ## IVI Gateway Attack
 ![attack](https://user-images.githubusercontent.com/20378368/105503603-24991380-5d0a-11eb-8a7a-1387fc79391d.png)
+### Get Target Binary
 - **Step 1**: IVI Gateway Log 분석  
 ![step1](https://user-images.githubusercontent.com/20378368/105573332-1c8bb300-5da0-11eb-9b70-fdc469eea789.PNG)
 ```
