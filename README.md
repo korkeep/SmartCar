@@ -13,7 +13,7 @@ Implementation of Smart-Car CAN protocol & Utility data for IVI(In-Vehicle Infot
 ## Architecture
 ![architecture](https://user-images.githubusercontent.com/20378368/105503161-9c1a7300-5d09-11eb-871d-fbd33bc41c54.PNG)
 
-## Let's Hack an IVI-Gateway 🐱‍💻
+## Let's Hack an IVI-Gateway 👿
 ![attack](https://user-images.githubusercontent.com/20378368/105503603-24991380-5d0a-11eb-8a7a-1387fc79391d.png)
 ### Exploit Target Binary
 - **Step 1**: IVI Gateway Log 분석  
@@ -49,7 +49,7 @@ Implementation of Smart-Car CAN protocol & Utility data for IVI(In-Vehicle Infot
 - scp root@<IVI Gateway IP>:<iviGateway 파일 경로> <Kali Linux에 저장될 경로>
 ```
 
-### Malware Injection 🐱‍💻
+### Malware Injection 👿
 - **Step 1**: Hex Editor를 이용한 바이너리 수정  
 ![step2](https://user-images.githubusercontent.com/20378368/105573522-8ce70400-5da1-11eb-9e8d-0f6ef08e5c32.PNG)
 ```
