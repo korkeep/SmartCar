@@ -8,7 +8,7 @@ Implementation of Smart-Car CAN protocol & Utility data for IVI(In-Vehicle Infot
 - **CAN shield**: RPi ↔ Arduino간 CAN 프로토콜 통신 가능
 - **Sensors**: Motor, Text LCD, LCD Monitor
 - **Android**: Android 앱, SmartCar 조종 인터페이스 제공
-- **SmartCar.pdf**: SmartCar 실습 방법 문서
+- **SmartCar.pdf**: SmartCar 해킹 실습
 
 ## Architecture
 ![architecture](https://user-images.githubusercontent.com/20378368/105503161-9c1a7300-5d09-11eb-871d-fbd33bc41c54.PNG)
